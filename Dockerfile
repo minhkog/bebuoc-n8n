@@ -17,7 +17,8 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
         echo "No packages to install."; \
     fi
 
-RUN ls
+RUN cd /usr/bin && \
+        ls
 
 # Bước 2: Sử dụng image n8n chính
 FROM ghcr.io/n8n-io/n8n:latest
