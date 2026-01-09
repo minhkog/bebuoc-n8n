@@ -1,45 +1,20 @@
-FROM python:3.13-alpine AS python-extras
-
+FROM python:3.13-alpine AS exec-files
 WORKDIR /extras
-RUN apk add --no-cache ffmpeg curl
+
+ARG EXECUTE_FILES="ffmpeg,curl"
+#ENV EXECUTE_FILES=$EXECUTE_FILES
+
+# Tách EXECUTE_FILES thành các gói riêng biệt và cài đặt từng gói
+RUN IFS=',' read -r -a packages <<< "$EXECUTE_FILES" && \
+    for package in "${packages[@]}"; do \
+        apk add --no-cache $package; \
+    done
 
 FROM ghcr.io/n8n-io/n8n:latest
-
-COPY --from=python-extras /usr/bin/ffmpeg /usr/bin/ffmpeg
-COPY --from=python-extras /usr/bin/curl /usr/bin/curl
-COPY --from=python-extras /usr/lib /usr/lib
+COPY --from=exec-files /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=exec-files /usr/bin/curl /usr/bin/curl
+COPY --from=exec-files /usr/lib /usr/lib
 
 USER node
 RUN ffmpeg -version
 RUN curl --version
-
-ARG POSTGRES_DB=Postgres.POSTGRES_DB
-ARG PGHOST=Postgres.PGHOST
-ARG PGPORT=Postgres.PGPORT
-ARG POSTGRES_USER=Postgres.POSTGRES_USER
-ARG POSTGRES_PASSWORD=Postgres.POSTGRES_PASSWORD
-ARG RAILWAY_PUBLIC_DOMAIN
-ARG HTTPP=https://
-
-ENV DB_POSTGRESDB_DATABASE=$POSTGRES_DB
-ENV DB_POSTGRESDB_HOST=$PGHOST
-ENV DB_POSTGRESDB_PORT=$PGPORT
-ENV DB_POSTGRESDB_USER=$POSTGRES_USER
-ENV DB_POSTGRESDB_PASSWORD=$POSTGRES_PASSWORD
-ENV DB_TYPE="postgresdb"
-ENV N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES="false"
-ENV N8N_ENCRYPTION_KEY="61917361e972eee872a861d0cbd4105f"
-ENV N8N_HOST=$RAILWAY_PUBLIC_DOMAIN
-ENV N8N_LOG_LEVEL="info"
-ENV N8N_NATIVE_PYTHON_RUNNER="true"
-ENV N8N_PORT="5678"
-ENV N8N_PROTOCOL="https"
-ENV N8N_RESTRICT_FILE_ACCESS_TO=""
-ENV N8N_RUNNERS_AUTH_TOKEN="61917361e972eee872a861d0cbd4105c"
-ENV N8N_RUNNERS_BROKER_LISTEN_ADDRESS="::"
-ENV N8N_RUNNERS_BROKER_PORT="5679"
-ENV N8N_RUNNERS_ENABLED="true"
-ENV N8N_RUNNERS_MODE="external"
-ENV NODES_EXCLUDE="[]"
-ENV RAILWAY_RUN_UID="0"
-ENV WEBHOOK_URL=$HTTPP$RAILWAY_PUBLIC_DOMAIN
