@@ -32,15 +32,15 @@ RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
         fi \
     done
 
-# Sao chép thư viện liên quan từ exec-files nếu cần (với quyền root)
+# Sao chép thư viện liên quan từ exec-files nếu cần, tránh đệ quy
 RUN if [ -d /usr/lib ]; then \
         echo "Copying libraries from exec-files..." && \
-        cp -r /usr/lib /usr/lib; \
+        rsync -av --exclude='/usr/lib/lib' /usr/lib/ /usr/lib/; \
     else \
         echo "Libraries not found, skipping copy."; \
     fi
 
-# Chuyển về người dùng 'node' để tiếp tục chạy các lệnh
+# Chuyển về người dùng 'node' để tiếp tục thực thi các lệnh
 USER node
 
 # Kiểm tra phiên bản của các công cụ
