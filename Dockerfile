@@ -28,6 +28,9 @@ COPY --from=exec-files /usr/lib /usr/lib
 
 USER node
 ARG EXECUTE_FILES
+
+RUN echo "sdsd: $EXECUTE_FILES"
+
 RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
         echo "Checking packages: $EXECUTE_FILES" && \
         
