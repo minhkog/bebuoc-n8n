@@ -8,7 +8,7 @@ ENV EXECUTE_FILES=$EXECUTE_FILES
 
 # Cài đặt các gói từ biến EXECUTE_FILES
 RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
-        echo "Installing packages: $EXECUTE_FILES" && \
+        echo "Installing packages: $EXECUTE_FILES ls" && \
         ls && \
         echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
                 echo "Installing $package..." && \
