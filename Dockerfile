@@ -1,21 +1,37 @@
-# Tạo một container từ Python Alpine để cài đặt ffmpeg
 FROM python:3.13-alpine AS python-extras
 
 WORKDIR /extras
-RUN echo "Install ffmpeg" && \
-    apk add --no-cache ffmpeg
+RUN apk add --no-cache ffmpeg curl
 
-# Dùng image chính của n8n
 FROM ghcr.io/n8n-io/n8n:latest
 
-# Sao chép ffmpeg từ image python-extras vào container n8n
 COPY --from=python-extras /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=python-extras /usr/bin/curl /usr/bin/curl
 COPY --from=python-extras /usr/lib /usr/lib
 
-# Đảm bảo quyền và thông tin người dùng đúng
 USER node
-ENV N8N_USER_ID=0
-ENV N8N_USER_GROUP=0
-
-# Kiểm tra lại ffmpeg đã được cài đặt thành công
 RUN ffmpeg -version
+RUN curl --version
+
+ENV DB_POSTGRESDB_DATABASE="${{Postgres.POSTGRES_DB}}"
+ENV DB_POSTGRESDB_HOST="${{Postgres.PGHOST}}"
+ENV DB_POSTGRESDB_PORT="${{Postgres.PGPORT}}"
+ENV DB_POSTGRESDB_USER="${{Postgres.POSTGRES_USER}}"
+ENV DB_POSTGRESDB_PASSWORD="${{Postgres.POSTGRES_PASSWORD}}"
+ENV DB_TYPE="postgresdb"
+ENV N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES="false"
+ENV N8N_ENCRYPTION_KEY=${{secret(32, "abcdef0123456789")}}
+ENV N8N_HOST="${{RAILWAY_PUBLIC_DOMAIN}}"
+ENV N8N_LOG_LEVEL="info"
+ENV N8N_NATIVE_PYTHON_RUNNER="true"
+ENV N8N_PORT="5678"
+ENV N8N_PROTOCOL="https"
+ENV N8N_RESTRICT_FILE_ACCESS_TO=""
+ENV N8N_RUNNERS_AUTH_TOKEN=${{secret(32, "abcdef0123456789")}}
+ENV N8N_RUNNERS_BROKER_LISTEN_ADDRESS="::"
+ENV N8N_RUNNERS_BROKER_PORT="5679"
+ENV N8N_RUNNERS_ENABLED="true"
+ENV N8N_RUNNERS_MODE="external"
+ENV NODES_EXCLUDE="[]"
+ENV RAILWAY_RUN_UID="0"
+ENV WEBHOOK_URL="https://${{RAILWAY_PUBLIC_DOMAIN}}/"
