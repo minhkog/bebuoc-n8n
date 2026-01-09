@@ -13,6 +13,8 @@ USER node
 RUN ffmpeg -version
 RUN curl --version
 
+ARG Postgres.POSTGRES_DB
+
 ENV DB_POSTGRESDB_DATABASE="${{Postgres.POSTGRES_DB}}"
 ENV DB_POSTGRESDB_HOST="${{Postgres.PGHOST}}"
 ENV DB_POSTGRESDB_PORT="${{Postgres.PGPORT}}"
