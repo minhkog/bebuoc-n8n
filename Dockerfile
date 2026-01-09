@@ -25,7 +25,7 @@ FROM ghcr.io/n8n-io/n8n:latest
 
 COPY --from=exec-files /usr/bin/ffmpeg /usr/bin/ffmpeg
 COPY --from=exec-files /usr/bin/curl /usr/bin/curl
-#COPY --from=exec-files /usr/lib /usr/lib
+COPY --from=exec-files /usr/lib /usr/lib
 
 USER node
 
