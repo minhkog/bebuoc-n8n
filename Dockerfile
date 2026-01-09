@@ -20,6 +20,10 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
 # Bước 2: Sử dụng image n8n chính
 FROM ghcr.io/n8n-io/n8n:latest
 
+COPY --from=exec-files /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=exec-files /usr/bin/curl /usr/bin/curl
+COPY --from=exec-files /usr/lib /usr/lib
+
 USER node
 
 RUN echo "Checking ffmpeg version..." && ffmpeg -version || echo "ffmpeg not found"
