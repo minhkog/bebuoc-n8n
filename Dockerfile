@@ -1,3 +1,4 @@
+# Bước 1: Tạo image exec-files để cài đặt các công cụ như ffmpeg, curl
 FROM python:3.13-alpine AS exec-files
 WORKDIR /extras
 
@@ -16,31 +17,18 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
         echo "No packages to install."; \
     fi
 
+# Bước 2: Sử dụng image n8n chính
 FROM ghcr.io/n8n-io/n8n:latest
 
-# Chạy dưới quyền root để sao chép các công cụ từ container exec-files vào container chính
-USER root
-
 # Sao chép các công cụ từ container exec-files vào container chính
-RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
-        if [ -f /usr/bin/$package ]; then \
-            echo "$package found, copying to /usr/bin/..." && \
-            cp /usr/bin/$package /usr/local/bin/ && \
-            echo "$package copied successfully."; \
-        else \
-            echo "$package not found, skipping copy."; \
-        fi \
-    done
+COPY --from=exec-files /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=exec-files /usr/bin/curl /usr/bin/curl
 
-# Sao chép thư viện liên quan từ exec-files nếu cần, tránh đệ quy
-RUN if [ -d /usr/lib ]; then \
-        echo "Copying libraries from exec-files..." && \
-        rsync -av --exclude='/usr/lib/lib' /usr/lib/ /usr/lib/; \
-    else \
-        echo "Libraries not found, skipping copy."; \
-    fi
+# Sao chép thư viện liên quan từ exec-files nếu cần (với quyền root)
+RUN echo "Copying libraries from exec-files..." && \
+    COPY --from=exec-files /usr/lib /usr/lib
 
-# Chuyển về người dùng 'node' để tiếp tục thực thi các lệnh
+# Đảm bảo quyền người dùng là 'node'
 USER node
 
 # Kiểm tra phiên bản của các công cụ
