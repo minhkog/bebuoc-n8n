@@ -22,12 +22,12 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
 
 # Bước 2: Sử dụng image n8n chính
 FROM ghcr.io/n8n-io/n8n:latest
-ARG EXECUTE_FILES
+
 COPY --from=exec-files /execute_files/* /usr/bin
 COPY --from=exec-files /usr/lib /usr/lib
 
 USER node
-
+ARG EXECUTE_FILES
 RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
         echo "Checking packages: $EXECUTE_FILES" && \
         
