@@ -2,11 +2,10 @@ FROM python:3.13-alpine AS exec-files
 WORKDIR /extras
 
 ARG EXECUTE_FILES="ffmpeg,curl"
-#ENV EXECUTE_FILES=$EXECUTE_FILES
+ENV EXECUTE_FILES=$EXECUTE_FILES
 
-# Tách EXECUTE_FILES thành các gói riêng biệt và cài đặt từng gói
-RUN IFS=',' read -r -a packages <<< "$EXECUTE_FILES" && \
-    for package in "${packages[@]}"; do \
+# Sử dụng echo và trích xuất các gói từ biến ENV, sau đó cài đặt
+RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
         apk add --no-cache $package; \
     done
 
