@@ -28,5 +28,16 @@ COPY --from=exec-files /usr/lib /usr/lib
 
 USER node
 
-RUN echo "Checking ffmpeg version..." && ffmpeg -version || echo "ffmpeg not found"
-RUN echo "Checking curl version..." && curl --version || echo "curl not found"
+RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
+        echo "Checking packages: $EXECUTE_FILES" && \
+        
+        echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
+                if [ -f /usr/bin/$package ]; then \
+                    echo "$package exists"; \
+                else \
+                    echo "ffmpeg does not exist"; \
+                fi \
+        done \
+    else \
+        echo "No packages to install."; \
+    fi
