@@ -1,6 +1,3 @@
-
-
-USER root
 FROM jrottenberg/ffmpeg:4.4-alpine AS ffmpeg
 
 FROM ghcr.io/n8n-io/n8n:latest
