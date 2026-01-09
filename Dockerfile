@@ -12,11 +12,12 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
         echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
                 echo "Installing $package..." && \
                 apk add --no-cache $package || { echo "Failed to install $package"; exit 1; }; \
-        done && \
-        ls \
+        done \
     else \
         echo "No packages to install."; \
     fi
+
+RUN ls
 
 # Bước 2: Sử dụng image n8n chính
 FROM ghcr.io/n8n-io/n8n:latest
