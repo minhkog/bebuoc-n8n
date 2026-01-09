@@ -1,8 +1,8 @@
+ARG EXECUTE_FILES="ffmpeg,curl"
+
 FROM python:3.13-alpine AS exec-files
 WORKDIR /extras
 
-# Biến môi trường chứa các gói cần cài đặt
-ARG EXECUTE_FILES="ffmpeg,curl"
 ENV EXECUTE_FILES=$EXECUTE_FILES
 
 # Kiểm tra và cài đặt các gói từ biến EXECUTE_FILES
@@ -17,7 +17,7 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
     fi
 
 FROM ghcr.io/n8n-io/n8n:latest
-
+ARG EXECUTE_FILES
 # Tách danh sách các công cụ cần sao chép từ ENV EXECUTE_FILES
 RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
         if [ -f /usr/bin/$package ]; then \
