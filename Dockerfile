@@ -1,9 +1,9 @@
-FROM ghcr.io/n8n-io/n8n:latest
+
 
 USER root
 FROM jrottenberg/ffmpeg:4.4-alpine AS ffmpeg
 
-FROM alpine:latest
+FROM ghcr.io/n8n-io/n8n:latest
 # Sao chép FFmpeg binary và thư viện cần thiết
 COPY --from=ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=ffmpeg /usr/local/lib /usr/local/lib
