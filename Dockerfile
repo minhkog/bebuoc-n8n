@@ -18,10 +18,23 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
 
 FROM ghcr.io/n8n-io/n8n:latest
 
-# Sao chép các công cụ từ container exec-files vào container chính
-COPY --from=exec-files /usr/bin/ffmpeg /usr/bin/ffmpeg
-COPY --from=exec-files /usr/bin/curl /usr/bin/curl
-COPY --from=exec-files /usr/lib /usr/lib
+# Tách danh sách các công cụ cần sao chép từ ENV EXECUTE_FILES
+RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
+        if [ -f /usr/bin/$package ]; then \
+            echo "$package found, copying to n8n..." && \
+            cp /usr/bin/$package /usr/bin/$package; \
+        else \
+            echo "$package not found, skipping copy."; \
+        fi \
+    done
+
+# Sao chép thư viện liên quan từ exec-files nếu cần
+RUN if [ -d /usr/lib ]; then \
+        echo "Copying libraries from exec-files..." && \
+        cp -r /usr/lib /usr/lib; \
+    else \
+        echo "Libraries not found, skipping copy."; \
+    fi
 
 USER node
 
