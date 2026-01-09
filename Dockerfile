@@ -1,8 +1,8 @@
-ARG EXECUTE_FILES="ffmpeg,curl"
-
 FROM python:3.13-alpine AS exec-files
 WORKDIR /extras
 
+# Biến môi trường chứa các gói cần cài đặt
+ARG EXECUTE_FILES="ffmpeg,curl,git"
 ENV EXECUTE_FILES=$EXECUTE_FILES
 
 # Kiểm tra và cài đặt các gói từ biến EXECUTE_FILES
@@ -17,8 +17,8 @@ RUN if [ -n "$EXECUTE_FILES" ] && [ "$EXECUTE_FILES" != "" ]; then \
     fi
 
 FROM ghcr.io/n8n-io/n8n:latest
-ARG EXECUTE_FILES
-# Tách danh sách các công cụ cần sao chép từ ENV EXECUTE_FILES
+
+# Sao chép các công cụ từ container exec-files vào container chính
 RUN echo $EXECUTE_FILES | tr ',' '\n' | while read package; do \
         if [ -f /usr/bin/$package ]; then \
             echo "$package found, copying to n8n..." && \
@@ -38,6 +38,7 @@ RUN if [ -d /usr/lib ]; then \
 
 USER node
 
-# Kiểm tra phiên bản của ffmpeg và curl
+# Kiểm tra phiên bản của các công cụ
 RUN echo "Checking ffmpeg version..." && ffmpeg -version || echo "ffmpeg not found"
 RUN echo "Checking curl version..." && curl --version || echo "curl not found"
+RUN echo "Checking git version..." && git --version || echo "git not found"
